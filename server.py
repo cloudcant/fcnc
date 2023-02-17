@@ -127,7 +127,7 @@ bots = 0
 
 @app.route("/", methods=["GET"])
 def api_home():
-  with open('index.html', 'r') as f:
+  with open('panel.html', 'r') as f:
     html = f.read()
   return html
 
