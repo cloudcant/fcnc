@@ -1,4 +1,6 @@
 # pyCNC
+### i know the code it a mess but it works rn , ill make better edits and beautify the code when it needs it
+
 ### This is a weird project im working on that is pretty much just a secure (not yet) cnc built on a simple flask api with many planned features :)
 > Here is a 4k (real) video i made (idk why i made it so fast) to explain how it works:
 
