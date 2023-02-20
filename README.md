@@ -6,43 +6,13 @@
     <img src="https://user-images.githubusercontent.com/66269103/220178043-9a22a090-2c17-441b-8484-5b286443ec0c.png" alt="Logo" width="80" height="80">
   </a>
 
-  <h3 align="center">pyCNC</h3>
+  <h3 align="center">Fcnc</h3>
 
   <p align="center">
-    A command and control flask server writen in python3
+    A command and controlserver writen in python3 using the Flask module
     <br />
   </p>
 </div>
-
-
-
-<!-- TABLE OF CONTENTS -->
-<details>
-  <summary>Table of Contents</summary>
-  <ol>
-    <li>
-      <a href="#about-the-project">About The Project</a>
-      <ul>
-        <li><a href="#built-with">Built With</a></li>
-      </ul>
-    </li>
-    <li>
-      <a href="#getting-started">Getting Started</a>
-      <ul>
-        <li><a href="#prerequisites">Prerequisites</a></li>
-        <li><a href="#installation">Installation</a></li>
-      </ul>
-    </li>
-    <li><a href="#usage">Usage</a></li>
-    <li><a href="#roadmap">Roadmap</a></li>
-    <li><a href="#contributing">Contributing</a></li>
-    <li><a href="#license">License</a></li>
-    <li><a href="#contact">Contact</a></li>
-    <li><a href="#acknowledgments">Acknowledgments</a></li>
-  </ol>
-</details>
-
-
 
 <!-- ABOUT THE PROJECT -->
 ## About The Project
