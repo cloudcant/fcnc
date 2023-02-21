@@ -2,9 +2,8 @@
 <br />
 <div align="center">
   <a href="https://github.com/cloudcant/pyCNC/">
-    <img src="https://user-images.githubusercontent.com/66269103/220426326-504a3207-0956-4025-8efa-ba76351beeee.png" alt="Logo" width="80" height="80">
+    <img src="https://user-images.githubusercontent.com/66269103/220436048-cf5c617b-3f09-40f7-bc10-dd055e60b520.png" alt="Logo" width="80" height="80">
   </a>
-
   <h3 align="center">Fcnc</h3>
 
   <p align="center">
