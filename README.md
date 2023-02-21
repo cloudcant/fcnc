@@ -62,8 +62,9 @@ usage here
   - [X] sending commands
   - [X] toggle bots button
   - [X] auto scroll output
-  - [ ] better style in general
+  - [X] better style in general
   - [X] command type dropdown
+  - [ ] authenticated command setting
   - [ ] seperate dos inputs
   - [ ] users
   - [ ] bot output 
