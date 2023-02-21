@@ -1,103 +1,75 @@
  <html lang="en">
-  
-<head>
-<title>Panel Login</title>
-<link href="https://fonts.googleapis.com/css?family=Lato:300,400,700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
-<link rel="stylesheet" href="https://cdn.discordapp.com/attachments/925089040892588053/1076305525257551883/style.css">
-<script
-  src="https://code.jquery.com/jquery-3.6.3.min.js"
-  integrity="sha256-pvPw+upLPUjgMXY0G+8O0xUf+/Im1MZjXxxgOcBQBXU="
-  crossorigin="anonymous"></script>
-<script src="https://unpkg.com/popper.js@1.16.1/dist/umd/popper.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.min.js"></script>
-  
-</head>
-  
-<body class="img js-fullheight" style="background-image: url(&quot;https://cdn.discordapp.com/attachments/925089040892588053/1076305669625479269/bg.jpg&quot;); height: 774px;" data-new-gr-c-s-check-loaded="14.1097.0" data-gr-ext-installed="">
-<section class="ftco-section">
-<div class="container">
-
-<div class="row justify-content-center">
-<div class="col-md-6 col-lg-4">
-<div class="login-wrap p-0">
-<h3 class="mb-4 text-center" id="title">Panel Login</h3>
-<form class="signin-form">
-
-<div class="form-group">
-<input id="password-field" type="password" class="form-control" placeholder="Password" required="">
-<span toggle="#password-field" class="fa fa-fw fa-eye field-icon toggle-password"></span>
-</div>
-<div class="form-group">
-<button type="submit" onclick="check()" class="form-control btn btn-primary submit px-3">Authenticate</button>
-</div>
-
-</form>
-
-
-</div>
-</div>
-</div>
-</div>
-</section>
-
-<script>
-  function check() {
-  var xhr = new XMLHttpRequest();
-  xhr.open('GET', '/admin?passwordcheck=' + document.getElementById('password-field').value, true), true
-  xhr.onreadystatechange = function() {
-    if (xhr.readyState == 4) {
-      if (xhr.responseText == "good") {
-        console.log(xhr.responseText)
-        x = document.getElementById("title");
-        x.innerHTML = "Succesful";
-        setTimeout(() => {
-        var win = window.open("/panel?password=" + document.getElementById('password-field').value, "_blank");
-        if (win) {
-            //Browser has allowed it to be opened
-            win.focus();
-        } else {
-            //Browser has blocked it
-            alert('Please allow popups for this website');
-        }
-           }, 2000);
-        }
-      }
-      else {
-        console.log(xhr.responseText)
-      }
-    }
-  xhr.send();
-  };
-           </script>
-  <script>
-(function($) {
-
-	"use strict";
-
-	var fullHeight = function() {
-
-		$('.js-fullheight').css('height', $(window).height());
-		$(window).resize(function(){
-			$('.js-fullheight').css('height', $(window).height());
-		});
-
-	};
-	fullHeight();
-
-	$(".toggle-password").click(function() {
-
-	  $(this).toggleClass("fa-eye fa-eye-slash");
-	  var input = $($(this).attr("toggle"));
-	  if (input.attr("type") == "password") {
-	    input.attr("type", "text");
-	  } else {
-	    input.attr("type", "password");
-	  }
-	});
-
-})(jQuery);
-</script>
-
-</body>
-</html>
+   <head>
+     <title>Panel Login</title>
+     <link href="https://fonts.googleapis.com/css?family=Lato:300,400,700&display=swap" rel="stylesheet">
+     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+     <link rel="stylesheet" href="/style.css">
+     <script src="https://code.jquery.com/jquery-3.6.3.min.js" integrity="sha256-pvPw+upLPUjgMXY0G+8O0xUf+/Im1MZjXxxgOcBQBXU=" crossorigin="anonymous"></script>
+     <script src="https://unpkg.com/popper.js@1.16.1/dist/umd/popper.min.js"></script>
+     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.min.js"></script>
+   </head>
+   <body class="img js-fullheight" style="background-image: url(&quot;https://i.imgur.com/W5rkYEn.jpg&quot;); background-size: cover; background-repeat: no-repeat; height: 774px;" data-new-gr-c-s-check-loaded="14.1097.0" data-gr-ext-installed="">
+     <section class="ftco-section">
+       <div class="container">
+         <div class="row justify-content-center">
+           <div class="col-md-6 col-lg-4">
+             <div class="login-wrap p-0">
+               <h3 class="mb-4 text-center" id="title">Panel Login</h3>
+               <form class="signin-form">
+                 <div class="form-group">
+                   <input id="password-field" type="password" class="form-control" placeholder="Password" required="">
+                   <span toggle="#password-field" class="fa fa-fw fa-eye field-icon toggle-password"></span>
+                 </div>
+                 <div class="form-group">
+                   <button type="submit" onclick="check()" class="form-control btn btn-primary submit px-3">Authenticate</button>
+                 </div>
+               </form>
+             </div>
+           </div>
+         </div>
+       </div>
+     </section>
+     <script>
+       function check() {
+         var xhr = new XMLHttpRequest();
+         xhr.open('GET', '/admin?passwordcheck=' + document.getElementById('password-field').value, true), true 
+           xhr.onreadystatechange = function() {
+             if (xhr.readyState == 4) {
+               if (xhr.responseText == "good") {
+                 x = document.getElementById("title");
+                 x.innerHTML = "Succesful";
+                 var win = window.open("/panel?password=" + document.getElementById('password-field').value, "_blank");
+                 if (win) {
+                   win.focus();
+                 }
+                 else{ 
+                   alert('Please allow popups for this website');
+                 }
+               }}else{null}}
+             xhr.send();
+             console.log(xhr.responseText) 
+       }; 
+     </script>
+     <script>
+       (function($) {
+         "use strict";
+         var fullHeight = function() {
+           $('.js-fullheight').css('height', $(window).height());
+           $(window).resize(function() {
+             $('.js-fullheight').css('height', $(window).height());
+           });
+         };
+         fullHeight();
+         $(".toggle-password").click(function() {
+           $(this).toggleClass("fa-eye fa-eye-slash");
+           var input = $($(this).attr("toggle"));
+           if (input.attr("type") == "password") {
+             input.attr("type", "text");
+           } else {
+             input.attr("type", "password");
+           }
+         });
+       })(jQuery);
+     </script>
+   </body>
+ </html>
