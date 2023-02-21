@@ -4,7 +4,7 @@ from os import system, name
 import json, html, threading, random, sys
 
 # setting the cnc server
-cnc_server = 'https://net.cloudcant.repl.co'
+cnc_server = 'http://0.0.0.0:80'
 
 
 # getting bot ip
