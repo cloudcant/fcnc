@@ -1,9 +1,8 @@
 <a name="readme-top"></a>
-
 <br />
 <div align="center">
   <a href="https://github.com/cloudcant/pyCNC/">
-    <img src="https://user-images.githubusercontent.com/66269103/220178043-9a22a090-2c17-441b-8484-5b286443ec0c.png" alt="Logo" width="80" height="80">
+    <img src="https://user-images.githubusercontent.com/66269103/220426326-504a3207-0956-4025-8efa-ba76351beeee.png" alt="Logo" width="80" height="80">
   </a>
 
   <h3 align="center">Fcnc</h3>
