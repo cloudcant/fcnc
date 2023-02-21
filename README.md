@@ -56,7 +56,7 @@ usage here
 - [X] Login Page
   - [ ] User
   - [X] Pass
-  - [ ] Encryption
+  - [X] Encryption
   - [ ] User types
   - [ ] multi users
   
