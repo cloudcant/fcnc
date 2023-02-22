@@ -77,7 +77,7 @@ usage here
     - [ ] diffrent methods
   - [ ] bot outputs
   
--[ ] Telnet connection
+- [ ] Telnet connection
 
 ## Acknowledgments
 
