@@ -76,7 +76,8 @@ usage here
   - [ ] Denial of service
     - [ ] diffrent methods
   - [ ] bot outputs
-
+  
+-[ ] Telnet connection
 
 ## Acknowledgments
 
