@@ -1,0 +1,12 @@
+<p> {adminpass} </p>
+<script>
+  setTimeout(function(){
+    var win = window.open("/panel?auth={adminpassencrypted}", "_blank");
+    if (win) {
+      win.focus();
+    }
+    else{ 
+      null
+    }
+}, 2000); 
+</script>
