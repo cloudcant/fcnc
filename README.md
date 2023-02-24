@@ -11,11 +11,10 @@
     <br />
   </p>
 </div>
+ 
+![the gamer](https://user-images.githubusercontent.com/66269103/221206842-92389c30-819f-4c96-ba9b-e920551eee1d.png)
 
-![Untitled](https://user-images.githubusercontent.com/66269103/220392562-8495df9e-6733-4484-9be5-db88552879c3.png)
-
-- outdated ^
-
+ 
 ## Getting Started
 
 This is developed and tested on unix so for best luck run this on a repl or a unix enviorment
@@ -56,8 +55,7 @@ usage here
   - [ ] User
   - [X] Pass
   - [X] Encryption
-  - [ ] User types
-  - [ ] multi users
+  - [X] Sessions
   
 - [x] Panel
   - [X] sending commands
