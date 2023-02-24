@@ -7,7 +7,7 @@
   <h3 align="center">Fcnc</h3>
 
   <p align="center">
-    A command and controlserver writen in python3 using the Flask module
+    A command and controlserver writen in python3 using the Flask module (live demo : https://replit.com/@cloudcant/fcnc)
     <br />
   </p>
 </div>
@@ -15,7 +15,6 @@
  
 ![the gamer](https://user-images.githubusercontent.com/66269103/221206842-92389c30-819f-4c96-ba9b-e920551eee1d.png)
 
- 
 ## Getting Started
 
 This is developed and tested on unix so for best luck run this on a repl or a unix enviorment
