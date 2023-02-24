@@ -7,7 +7,7 @@
   <h3 align="center">Fcnc</h3>
 
   <p align="center">
-    A command and controlserver writen in python3 using the Flask module (live demo : https://replit.com/@cloudcant/fcnc)
+    A command and controlserver writen in python3 using the Flask module. <a href="https://replit.com/@cloudcant/fcnc">Live Demo</a>
     <br />
   </p>
 </div>
