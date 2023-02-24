@@ -72,7 +72,7 @@ usage here
   
 - [X] Bot
   - [X] Encryption of commands
-  - [ ] Better encryption of commands
+  - [X] Better encryption of commands (fernet)
   - [X] RCE
   - [ ] Denial of service
     - [ ] diffrent methods
