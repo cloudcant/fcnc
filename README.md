@@ -1,4 +1,4 @@
-# development halted, repl project terminated and progress was lost
+#repl project terminated and progress was lost, Development will continue on a local machine but will be slower until i can find another portable development envoirment
 <a name="readme-top"></a>
 <br />
 <div align="center">
