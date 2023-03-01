@@ -1,4 +1,4 @@
-# repl project terminated and progress was lost, Development will continue on a local machine but will be slower until i can find another portable development envoirment
+# repl project terminated and progress was lost, Development will continue on a local machine but will be slower until i can find another portable development envoirment or until i get repl working 
 <a name="readme-top"></a>
 <br />
 <div align="center">
@@ -65,8 +65,6 @@ usage here
   - [X] better style in general
   - [X] command type dropdown
   - [ ] authenticated command setting
-  - [ ] seperate dos inputs
-  - [ ] users
   - [ ] bot output 
   
 - [X] Bot
